@@ -1,9 +1,11 @@
 class Game
   require 'json'
-  attr_accessor :word_array
+  attr_accessor :word_array, :current_word, :guess_array, :num_of_guesses, :incorrect_guesses
 
   def initialize
     @word_array = build_word_array
+    @guess_array = []
+    @num_of_guesses = 0
   end
 
   def build_word_array
@@ -14,7 +16,19 @@ class Game
   end
 
   def select_random_word
-    @word_array[rand(@word_array.length)]
+    @current_word = @word_array[rand(@word_array.length)]
+  end
+
+  def build_guess_array
+    return unless guess_array.empty?
+
+    @current_word.length.times { @guess_array.push('_') }
+  end
+
+  def compare_guess_to_word(guess)
+    @current_word.split('').each_with_index do |letter, index|
+      @guess_array[index] = letter if guess == letter
+    end
   end
 
   def to_json(*args)
@@ -25,3 +39,12 @@ class Game
 
   def self.json_create(object) end
 end
+
+
+game = Game.new
+game.select_random_word
+game.build_guess_array
+p game.current_word
+p game.guess_array
+p game.compare_guess_to_word('a')
+p game.guess_array
