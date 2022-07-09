@@ -6,6 +6,7 @@ class Game
     @word_array = build_word_array
     @guess_array = []
     @num_of_guesses = 0
+    @incorrect_guesses = []
   end
 
   def build_word_array
@@ -26,9 +27,16 @@ class Game
   end
 
   def compare_guess_to_word(guess)
+    @num_of_guesses += 1
+    return incorrect_guess(guess) unless @current_word.include?(guess)
+
     @current_word.split('').each_with_index do |letter, index|
       @guess_array[index] = letter if guess == letter
     end
+  end
+
+  def incorrect_guess(guess)
+    @incorrect_guesses.push(guess)
   end
 
   def to_json(*args)
@@ -48,3 +56,4 @@ p game.current_word
 p game.guess_array
 p game.compare_guess_to_word('a')
 p game.guess_array
+p game.incorrect_guesses
