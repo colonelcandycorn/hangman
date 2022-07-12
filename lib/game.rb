@@ -49,7 +49,23 @@ class Game
   end
 
   def incorrect_guess(guess)
-    @incorrect_guesses.push(guess)
+    @incorrect_guesses.push(guess) unless @incorrect_guesses.include?(guess)
+  end
+
+  def check_winner
+    return guess_array.join('') == @current_word
+  end
+
+  def play_game
+    select_random_word unless @current_word
+    build_guess_array
+
+    while @num_of_guesses < 12 && !check_winner
+      puts @guess_array.join('')
+      puts "Incorrect Guesses: #{@incorrect_guesses.join(', ')}"
+      compare_guess_to_word(@player.take_a_guess)
+      p @num_of_guesses
+    end
   end
 
   def to_json(*args)
@@ -74,12 +90,13 @@ class Game
 end
 
 game = Game.new
-game.select_random_word
-game.build_guess_array
-game.compare_guess_to_word('a')
-p game.current_word
-p game.guess_array
-json = JSON.generate(game)
-obj = JSON.parse(json, create_additions: true)
-p json
-p obj.player.name
+game.play_game
+# game.select_random_word
+# game.build_guess_array
+# game.compare_guess_to_word('a')
+# p game.current_word
+# p game.guess_array
+# json = JSON.generate(game)
+# obj = JSON.parse(json, create_additions: true)
+# p json
+# p obj.player.name
