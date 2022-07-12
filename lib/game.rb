@@ -1,12 +1,25 @@
 class Game
   require 'json'
-  attr_accessor :word_array, :current_word, :guess_array, :num_of_guesses, :incorrect_guesses
+  require_relative './player'
 
-  def initialize
+  attr_accessor :word_array, :current_word, :guess_array, :num_of_guesses, :incorrect_guesses, :player
+
+  def initialize(name = '')
     @word_array = build_word_array
     @guess_array = []
     @num_of_guesses = 0
     @incorrect_guesses = []
+    @player = create_player(name)
+  end
+
+  def create_player(name)
+    return Player.new(name) unless name.empty?
+
+    puts 'Please enter your name'
+    new_name = gets.chomp.delete('^a-zA-Z')
+    return create_player if new_name.empty?
+
+    Player.new(new_name)
   end
 
   def build_word_array
@@ -41,19 +54,32 @@ class Game
 
   def to_json(*args)
     {
-      JSON.create_id => self.class.name
+      JSON.create_id => self.class.name,
+      'guess_array' => @guess_array,
+      'incorrect_guesses' => @incorrect_guesses,
+      'num_of_guesses' => @incorrect_guesses,
+      'player' => @player.name,
+      'current_word' => @current_word
     }.to_json(*args)
   end
 
-  def self.json_create(object) end
+  def self.json_create(object)
+    game = new(object['player'])
+    game.guess_array = object['guess_array']
+    game.incorrect_guesses = object['incorrect_guesses']
+    game.num_of_guesses = object['num_of_guesses']
+    game.current_word = object['current_word']
+    game
+  end
 end
-
 
 game = Game.new
 game.select_random_word
 game.build_guess_array
+game.compare_guess_to_word('a')
 p game.current_word
 p game.guess_array
-p game.compare_guess_to_word('a')
-p game.guess_array
-p game.incorrect_guesses
+json = JSON.generate(game)
+obj = JSON.parse(json, create_additions: true)
+p json
+p obj.player.name
