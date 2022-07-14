@@ -50,10 +50,10 @@ class Game
   end
 
   def incorrect_guess(guess)
-    unless @incorrect_guesses.include?(guess)
-      @incorrect_guesses.push(guess)
-      @num_of_guesses += 1
-    end
+    return if @incorrect_guesses.include?(guess)
+
+    @incorrect_guesses.push(guess)
+    @num_of_guesses += 1
   end
 
   def check_winner
@@ -106,17 +106,14 @@ class Game
   end
 
   def self.list_saves
-    path = File.expand_path('~/hangman/files/*')
-    saves = Dir[path]
+    path = File.expand_path('~/hangman/files')
+    return nil unless Dir.exist?(path)
+
+    saves = Dir["#{path}/*"]
     saves.each_with_index do |file, index|
       puts "[#{index}] #{file}\n"
     end
     saves
-  end
-
-  def self.choose_save_to_load(saves)
-    choice = gets.chomp.delete('^\d')[0]
-    saves[choice]
   end
 
   def self.load_game(file)
@@ -124,16 +121,3 @@ class Game
     JSON.parse(save[0], create_additions: true)
   end
 end
-
-game = Game.new
-game.list_saves
-game.play_game
-# game.select_random_word
-# game.build_guess_array
-# game.compare_guess_to_word('a')
-# p game.current_word
-# p game.guess_array
-# json = JSON.generate(game)
-# obj = JSON.parse(json, create_additions: true)
-# p json
-# p obj.player.name
