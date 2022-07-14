@@ -40,6 +40,8 @@ class Game
   end
 
   def compare_guess_to_word(guess)
+    return save_game if guess == 'save'
+
     @num_of_guesses += 1
     return incorrect_guess(guess) unless @current_word.include?(guess)
 
@@ -53,7 +55,7 @@ class Game
   end
 
   def check_winner
-    return guess_array.join('') == @current_word
+    guess_array.join('') == @current_word
   end
 
   def play_game
@@ -61,11 +63,13 @@ class Game
     build_guess_array
 
     while @num_of_guesses < 12 && !check_winner
-      puts @guess_array.join('')
+      puts @guess_array.join(' ')
       puts "Incorrect Guesses: #{@incorrect_guesses.join(', ')}"
       compare_guess_to_word(@player.take_a_guess)
-      p @num_of_guesses
     end
+
+    puts 'Congrats you guessed the word' if check_winner
+    puts 'You failed to guess the word' if @num_of_guesses == 12 && !check_winner
   end
 
   def to_json(*args)
@@ -87,9 +91,25 @@ class Game
     game.current_word = object['current_word']
     game
   end
+
+  def save_game
+    save = JSON.generate(self)
+    name = "#{@player.name}#{guess_array.join('')}"
+    path = File.expand_path("~/hangman/saves/#{name}.txt")
+    File.open(path, 'w') { |f| f.write save }
+  end
+
+  def list_saves
+    path = File.expand_path('~/hangman/saves/*')
+    saves = Dir[path]
+    saves.each_with_index do |file, index|
+      puts "[#{index}] #{file}\n"
+    end
+  end
 end
 
 game = Game.new
+game.list_saves
 game.play_game
 # game.select_random_word
 # game.build_guess_array
