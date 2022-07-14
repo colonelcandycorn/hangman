@@ -42,7 +42,6 @@ class Game
   def compare_guess_to_word(guess)
     return save_game if guess == 'save'
 
-    @num_of_guesses += 1
     return incorrect_guess(guess) unless @current_word.include?(guess)
 
     @current_word.split('').each_with_index do |letter, index|
@@ -51,7 +50,10 @@ class Game
   end
 
   def incorrect_guess(guess)
-    @incorrect_guesses.push(guess) unless @incorrect_guesses.include?(guess)
+    unless @incorrect_guesses.include?(guess)
+      @incorrect_guesses.push(guess)
+      @num_of_guesses += 1
+    end
   end
 
   def check_winner
@@ -65,11 +67,12 @@ class Game
     while @num_of_guesses < 12 && !check_winner
       puts @guess_array.join(' ')
       puts "Incorrect Guesses: #{@incorrect_guesses.join(', ')}"
+      puts "Remaining Guesses: #{12 - @num_of_guesses}"
       compare_guess_to_word(@player.take_a_guess)
     end
 
     puts 'Congrats you guessed the word' if check_winner
-    puts 'You failed to guess the word' if @num_of_guesses == 12 && !check_winner
+    puts "You failed to guess the word: #{@current_word}" if @num_of_guesses == 12 && !check_winner
   end
 
   def to_json(*args)
@@ -102,12 +105,18 @@ class Game
     File.open(path + "/#{name}.txt", 'w') { |f| f.write save }
   end
 
-  def list_saves
+  def self.list_saves
     path = File.expand_path('~/hangman/files/*')
     saves = Dir[path]
     saves.each_with_index do |file, index|
       puts "[#{index}] #{file}\n"
     end
+    saves
+  end
+
+  def self.choose_save_to_load(saves)
+    choice = gets.chomp.delete('^\d')[0]
+    saves[choice]
   end
 
   def self.load_game(file)
