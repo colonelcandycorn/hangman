@@ -95,12 +95,13 @@ class Game
   def save_game
     save = JSON.generate(self)
     name = "#{@player.name}#{guess_array.join('')}"
-    path = File.expand_path("~/hangman/saves/#{name}.txt")
-    File.open(path, 'w') { |f| f.write save }
+    path = File.expand_path('~/hangman/files')
+    Dir.mkdir(path) unless Dir.exist?(path)
+    File.open(path + "/#{name}.txt", 'w') { |f| f.write save }
   end
 
   def list_saves
-    path = File.expand_path('~/hangman/saves/*')
+    path = File.expand_path('~/hangman/files/*')
     saves = Dir[path]
     saves.each_with_index do |file, index|
       puts "[#{index}] #{file}\n"
