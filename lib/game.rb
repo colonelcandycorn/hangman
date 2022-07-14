@@ -77,8 +77,9 @@ class Game
       JSON.create_id => self.class.name,
       'guess_array' => @guess_array,
       'incorrect_guesses' => @incorrect_guesses,
-      'num_of_guesses' => @incorrect_guesses,
+      'num_of_guesses' => @num_of_guesses,
       'player' => @player.name,
+      'player_guesses' => @player.guesses,
       'current_word' => @current_word
     }.to_json(*args)
   end
@@ -89,6 +90,7 @@ class Game
     game.incorrect_guesses = object['incorrect_guesses']
     game.num_of_guesses = object['num_of_guesses']
     game.current_word = object['current_word']
+    game.player.guesses = object['player_guesses']
     game
   end
 
@@ -106,6 +108,11 @@ class Game
     saves.each_with_index do |file, index|
       puts "[#{index}] #{file}\n"
     end
+  end
+
+  def self.load_game(file)
+    save = File.readlines(file)
+    JSON.parse(save[0], create_additions: true)
   end
 end
 
