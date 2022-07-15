@@ -1,6 +1,8 @@
 require_relative './player'
 require_relative './game'
 
+game_state = true
+
 def create_game
   puts '[1] New Game'
   puts '[2] Load Game'
@@ -20,10 +22,14 @@ def play_again?
   puts '[2] End game'
   choice = Player.new_or_load_game
 
-  return create_game unless choice == '2'
+  return true unless choice == '2'
+
+  false
 end
 
 puts 'Welcome to Hangman'
-game = create_game
-game.play_game
-play_again?
+while game_state
+  game = create_game
+  game.play_game
+  game_state = play_again?
+end
